@@ -18,17 +18,11 @@ def are_resources_sufficient(selected_beverage, availables_ingredients, beverage
         case "latte":
             counter_item = 1   
         case "cappuchino":
-            counter_item = 2   
+            counter_item = 2              
             
-    if beverages[counter_item][selected_beverage][counter_item] > availables_ingredients[counter_item]:
-        print(f"We run out of coffee. Our sincere apology")
+    if beverages[selected_beverage][counter_item] > availables_ingredients[counter_item]:
+        print(f"We run out of {selected_beverage}. Our sincere apology")
         return False
-        
-    beverages = [{"espresso": (50, 20, 5)}, {"latte": (20, 20, 30)}, {"cappuchino": (30, 20, 20)}]    
-    # tupple organize as: water, coffee, milk  
-    availables_ingredients = [70, 50, 80]
-    #list contains quantities water, coffee, and milk
-    
     return True   
    
 #####################################################################################           
@@ -89,56 +83,76 @@ def make_coffee(input_beverage, beverages, availables_ingredients):
         case "latte":
             counter_item = 1   
         case "cappuchino":
-            counter_item = 2 
+            counter_item = 2   
             
-    availables_ingredients[counter_item] -= beverages[counter_item][input_beverage][counter_item]
+    availables_ingredients[counter_item] -= beverages[input_beverage][counter_item]
 
-    # tupple organize as: water, coffee, milk  
-    #list contains quantities water, coffee, and milk
-    prices = {"espresso": 9, "latte": 12, "cappuchino":15}
+
+######################################################################################  
+
+def amounts_of_drinks_available(beverages, availables_ingredients, amount_espresso, amount_latte, amount_capu):
+    
+    counter_items = 0
+    while (True):
+        for key, value in beverages.items(): 
+            if beverages[key][counter_items] * amount_espresso > availables_ingredients[counter_items]:
+                print(f"We run out of {key}. Please insert less espresso shots")
+                return False
+            elif beverages[key][counter_items] * amount_latte > availables_ingredients[counter_items]:
+                print(f"We run out of {key}. Please insert less latte cups")
+                return False
+            elif beverages[key][counter_items] * amount_capu > availables_ingredients[counter_items]:
+                print(f"We run out of {key}. Please insert less cappuchino cups")
+                return False
+            else:
+                return True
+     
 ######################################################################################       
 
 def run_main():
    
-    beverages = [{"espresso": (50, 20, 5)}, {"latte": (20, 20, 30)}, {"cappuchino": (30, 20, 20)}]    
+    beverages = {"espresso": (50, 20, 5), "latte": (20, 20, 30), "cappuchino": (30, 20, 20)}    
     # tupple organize as: water, coffee, milk 
-     
-    # print(beverages[0]["espresso"][0])  
      
     availables_ingredients = [70, 50, 80]
     #list contains quantities water, coffee, and milk
-    prices = {"espresso": 9, "latte": 12, "cappuchino":15}
-    
-    print("""Please choose your prefered beverage:
-            for cappuchino type C
-            for latte type L
-            for espresso type E
-            if you want to cancel action type Q""")
-    
-    user_input = {
-        "C": "cappuchino",
-        "L": "latte",
-        "E": "espresso"
-    }
+    prices = {"espresso": 3, "latte": 5, "cappuchino":6}
     
     while True:
-        input_beverage = input(">> ").upper()
-        if input_beverage in user_input:
-            break
-        elif input_beverage == 'Q':
-            return False
+        print("""Please choose your prefered beverage:
+                for cappuchino type C
+                for latte type L
+                for espresso type E
+                if you want to cancel action type Q""")
+        
+        user_input = {
+            "C": "cappuchino",
+            "L": "latte",
+            "E": "espresso"
+        }
+        
+        while True:
+            input_beverage = input(">> ").upper()
+            if input_beverage in user_input:
+                break
+            elif input_beverage == 'Q':
+                print("Maybe next time!")
+                return False
+            else:
+                print("Invalid option. Please choose again.")
+
+        selected_beverage = are_resources_sufficient(user_input[input_beverage], availables_ingredients, beverages)
+        if selected_beverage == True:
+            print ("For the payment part:")
+            user_payment = process_coins(prices[user_input[input_beverage]])
+            transaction_successful = is_transaction_successful(user_payment, prices[user_input[input_beverage]])
+            if transaction_successful:
+                make_coffee(user_input[input_beverage], beverages, availables_ingredients)
         else:
-            print("Invalid option. Please choose again.")
-            
-    print(user_input[input_beverage])
-    selected_beverage = are_resources_sufficient(user_input[input_beverage], availables_ingredients, beverages)
-    if selected_beverage == True:
-        print ("For the payment part:")
-        user_payment = process_coins(prices[user_input[input_beverage]])
-        transaction_successful = is_transaction_successful(user_payment, prices[user_input[input_beverage]])
-        if transaction_successful:
-            make_coffee(user_input[input_beverage], beverages, availables_ingredients)
-    else:
-        print("Have a good day!")
+            print("Have a good day!")
+            break
+        continue_input = input("Do you want to order something more? type Y/N for yes or no ")
+        if continue_input.upper() != 'Y':
+            break
         
 my_decorator(run_main())
